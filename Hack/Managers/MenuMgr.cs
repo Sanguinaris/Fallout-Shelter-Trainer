@@ -1,147 +1,105 @@
-﻿using System;
+﻿using PPFalloutShellterTrn.Hack.MenuStuff;
+using PPFalloutShellterTrn.Hack.MenuStuff.ModMenus;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using FSHack.Hack.Menus;
 
-namespace FSHack.Hack.Managers
+namespace PPFalloutShellterTrn.Hack.Managers
 {
+    //Responsible for showing the right menu
     class MenuMgr
     {
-        private List<Menu> menuList = new List<Menu>();
-        private int curActiveMenu = -1;
 
-        static readonly MenuMgr _instance = new MenuMgr();
-
-        public static MenuMgr Instance
+        public static void Reset()
         {
-            get
+            Menus.Clear();
+            EventMgr.DeleteFunc(Events.OnUpdate, OnUpdate);
+            EventMgr.DeleteFunc(Events.OnGui, DrawMenu);
+
+            EventMgr.RegisterFunc(Events.OnGui, DrawMenu);
+            EventMgr.RegisterFunc(Events.OnUpdate, OnUpdate);
+
+            Menus.Add(new VaultMenu());
+            Menus.Add(new DwellerMenu());
+            Menus.Add(new InventoryMenu());
+            Menus.Add(new RandomEventsMenu());
+
+            foreach (Menu menu in Menus)
             {
-                return _instance;
+                menu.OnInit();
             }
         }
 
-        public MenuMgr()
+        static bool hadUnlockedView = false;
+        private static void SetPauseState(bool state)
         {
-            menuList.Add(new VaultMenu());
-            menuList.Add(new DwellerMenu());
-            menuList.Add(new InventoryMenu());
-            menuList.Add(new RandomEventMenu());
-            menuList.Add(new MenuSelection());
+            if (!MonoSingleton<VaultGUIManager>.IsInstanceValid) return;
+            MonoSingleton<VaultGUIManager>.Instance.BlockInput(state);
+            Time.timeScale = (state) ? 0 : 1;
         }
 
-        public void onStart()
+        public static void DrawMenu()
         {
-            foreach(Menu menu in menuList)
+            //Draw stuff
+            if(iCurMenu >= 0)
             {
-                menu.onStart();
-            }
-        }
-
-        bool wasMenuOn = false;
-
-        public void onUpdate()
-        {
-            for(int i = 0; i < menuList.Count; i++)
-            {
-                if(Input.GetKeyDown(menuList[i].getMenuBind()))
+                if (Input.GetKeyDown(KeyCode.Escape))
                 {
-                    if (i == curActiveMenu)
-                        curActiveMenu = -1;
+                    iCurMenu = -1;
+                    SetPauseState(false);
+                }
+
+                Menus[iCurMenu].OnDraw();
+            }
+        }
+
+        public static void OnUpdate()
+        {
+            for (int i = 0; i < Menus.Count; i++)
+            {
+                if(Input.GetKeyDown(Menus[i].getKey()))
+                {
+                    if (i == iCurMenu)
+                    {
+                        iCurMenu = -1;
+                        SetPauseState(false);
+                    }
                     else
-                        this.curActiveMenu = i;
+                    {
+                        iCurMenu = i;
+                        SetPauseState(true);
+                    }
                 }
 
-                menuList[i].onUpdate();
-            }
-
-            if(Input.GetKeyDown(KeyCode.Escape))
-            {
-                curActiveMenu = -1;
-            }
-
-            if(curActiveMenu >= 0)
-            {
-                wasMenuOn = true;
-                if (MonoSingleton<VaultGUIManager>.IsInstanceValid)
-                {
-                    MonoSingleton<VaultGUIManager>.Instance.BlockInput(true);
-                }
-            }else if(wasMenuOn)
-            {
-                wasMenuOn = false;
-                if (MonoSingleton<VaultGUIManager>.IsInstanceValid)
-                {
-                    MonoSingleton<VaultGUIManager>.Instance.BlockInput(false);
-                }
+                Menus[i].OnUpdate();
             }
         }
 
-        public void onGUI()    //if cant get overriden then use another fúnc name
+        public static void setCurActiveMenu(int idx)
         {
-            if (curActiveMenu >= 0)
-                menuList[curActiveMenu].drawGui();
+            iCurMenu = idx;
         }
 
-        public Menu getModuleByName(string name)
+        public static MenuStuff.Menu getMenuByIdx(int idx)
         {
-            foreach (Menu menu in menuList)
-            {
-                if (menu.getMenuName() == name)
-                    return menu;
-            }
+            return Menus[idx];
+        }
+
+        public static MenuStuff.Menu getCurrentMenu()
+        {
+            if (iCurMenu >= 0)
+                return Menus[iCurMenu];
             return null;
         }
 
-        public List<Menu> getAllMods()
+        public static int getCurMenuIdx()
         {
-            return menuList;
+            return iCurMenu;
         }
 
-        public Menu getCurActiveMenu()
-        {
-            if (curActiveMenu < 0)
-                return null;
-            return menuList[curActiveMenu];
-        }
-
-        public int getCurActiveMenuIdx()
-        {
-            return curActiveMenu;
-        }
-
-        public void setActiveMenu(Menu menu)
-        {
-            for(int i = 0; i < menuList.Count; i++)
-            {
-                if (menuList[i] == menu)
-                    curActiveMenu = i;
-            }
-        }
-
-        public void setActiveMenu(int idx)
-        {
-            if(idx < menuList.Count && idx > -2)
-            {
-                curActiveMenu = idx;
-            }
-        }
-
-        public Menu getMenuByCategory(Categories category)
-        {
-            foreach(Menu menu in menuList)
-            {
-                if (menu.getCategory() == category)
-                    return menu;
-            }
-            return null;
-        }
-
-        public int getModuleListCount()
-        {
-            return menuList.Count;
-        }
+        static List<MenuStuff.Menu> Menus = new List<MenuStuff.Menu>();
+        static int iCurMenu = -1;
     }
 }

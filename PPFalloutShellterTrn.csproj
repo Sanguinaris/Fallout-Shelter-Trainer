@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FD7FC41C-CDC9-4CFB-9E20-D63DF84710F1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PPFalloutShellterTrn</RootNamespace>
+    <AssemblyName>PPFalloutShellterTrn</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Hack\BaseGameobject.cs" />
+    <Compile Include="Hack\Managers\EventMgr.cs" />
+    <Compile Include="Hack\Managers\MenuMgr.cs" />
+    <Compile Include="Hack\MenuStuff\Controls\Button.cs" />
+    <Compile Include="Hack\MenuStuff\Controls\CheckBox.cs" />
+    <Compile Include="Hack\MenuStuff\Controls\Control.cs" />
+    <Compile Include="Hack\MenuStuff\Controls\Slider.cs" />
+    <Compile Include="Hack\MenuStuff\Menu.cs" />
+    <Compile Include="Hack\MenuStuff\ModMenus\ModMenus.cs" />
+    <Compile Include="Hack\Modules\DwellerMods.cs" />
+    <Compile Include="Hack\Modules\InventoryMods.cs" />
+    <Compile Include="Hack\Modules\RandomEventMods.cs" />
+    <Compile Include="Hack\Modules\VaultMods.cs" />
+    <Compile Include="Loader.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp-Lib">
+      <HintPath>S:\GAMES\SteamApss\steamapps\common\Fallout Shelter\FalloutShelter_Data\Managed\Assembly-CSharp-Lib.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>S:\GAMES\SteamApss\steamapps\common\Fallout Shelter\FalloutShelter_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -1,61 +1,49 @@
-﻿using FSHack.Hack.Mods;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace FSHack.Hack.Managers
+namespace PPFalloutShellterTrn.Hack.Managers
 {
-    public enum EventNames
+    enum Events
     {
-        onUpdate,
-        onRender
-    };
+        OnUpdate,
+        OnGui
+    }
 
     class EventMgr
     {
-        static readonly EventMgr _instance = new EventMgr();
+        private static Dictionary<Events, List<Action>> EventFuncs = new Dictionary<Events, List<Action>>();
 
-        public static EventMgr Instance
+        public static bool shouldContinue = true;
+
+        public static void Reset()
         {
-            get
+            EventFuncs.Clear();
+            foreach (Events Event in Enum.GetValues(typeof(Events)))
             {
-                return _instance;
+                EventFuncs.Add(Event, new List<Action>());
             }
         }
 
-        Dictionary<EventNames, List<Module>> eventList = new Dictionary<EventNames, List<Module>>();
-
-        public EventMgr() {
-            eventList.Add(EventNames.onUpdate, new List<Module>());
-            eventList.Add(EventNames.onRender, new List<Module>());
+        public static void RegisterFunc(Events eventname, Action funky)
+        {
+            EventFuncs[eventname].Add(funky);
         }
 
-        public void onUpdate()
+        public static void DeleteFunc(Events eventname, Action funky)
         {
-            foreach(Module mod in eventList[EventNames.onUpdate])
+            EventFuncs[eventname].Remove(funky);
+        }
+
+        public static void InvokeEvent(Events eventName)
+        {
+            foreach(Action funky in EventFuncs[eventName])
             {
-                mod.onUpdate();
+                funky();
+                if (!shouldContinue)
+                    break;
             }
-        }
 
-        public void onRender()
-        {
-            foreach(Module mod in eventList[EventNames.onRender])
-            {
-                mod.onDraw();
-            }
-        }
-
-        public void registerEventListener(EventNames name, Module mod)
-        {
-            eventList[name].Add(mod);
-        }
-
-        public void deleteEventListener(EventNames name, Module mod)
-        {
-            eventList[name].Remove(mod);
+            shouldContinue = true;
         }
     }
 }
